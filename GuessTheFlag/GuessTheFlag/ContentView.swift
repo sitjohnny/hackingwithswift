@@ -14,21 +14,34 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var scoreTitle = ""
     @State private var score = 0
+    @State private var rounds = 0
+    @State private var showGameover = false
 
     func flagTapped(_ number: Int) {
         if number == correctAnswer {
             scoreTitle = "Correct"
             score += 10
         } else {
-            scoreTitle = "Wrong"
+            scoreTitle = "Wrong! That's the flag of \(countries[number])"
         }
 
+        if rounds == 7 {
+            showGameover = true
+        }
+
+        rounds += 1
         showingScore = true
     }
 
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0 ... 2)
+    }
+
+    func resetGame() {
+        score = 0
+        rounds = 0
+        showGameover = false
     }
 
     var body: some View {
@@ -77,6 +90,10 @@ struct ContentView: View {
             Button("Continue", action: askQuestion)
         } message: {
             Text("Your score is \(score)")
+        }.alert("Game Over", isPresented: $showGameover) {
+            Button("Reset", action: resetGame)
+        } message: {
+            Text("Your final score is \(score)")
         }
     }
 }
